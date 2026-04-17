@@ -4,7 +4,7 @@ A tiny card-making tool for writing beautiful notes and sharing them
 on social platform. Pick a flavor, type your thought, export your card.
 
 ## ✨ Try it live
-👉 [cardcake.github.io](https://your-url-here)
+👉 [https://doubihunter.github.io/CardCake]
 
 ## What it does
 - 8 color themes (Vanilla, Matcha, Raspberry...)
