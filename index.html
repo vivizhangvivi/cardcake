@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardCake</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Space+Mono:wght@700&family=Inter:wght@300;700;900&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',sans-serif;font-size:13px;background:#f5f5f5;color:#1a1a1a;min-height:100vh}
+.app{max-width:960px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:1fr 400px;gap:28px;align-items:start}
+.panel{background:#fff;border-radius:16px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.preview-col{position:sticky;top:32px;display:flex;flex-direction:column;align-items:center}
+.sec{margin-bottom:8px}
+label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;color:#888;margin-bottom:4px}
+textarea{width:100%;padding:8px 11px;font-size:13px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;line-height:1.6;resize:vertical}
+textarea:focus{outline:none;border-color:#aaa}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.chip{padding:4px 10px;font-size:11px;border-radius:20px;border:1px solid #e0e0e0;background:#f5f5f5;color:#666;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .12s}
+.chip:hover{background:#eee}
+.chip.on{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.swg{display:flex;flex-wrap:nowrap;gap:6px;padding-bottom:18px;overflow-x:auto}
+.sw{width:38px;height:38px;border-radius:8px;cursor:pointer;border:2px solid transparent;flex-shrink:0;position:relative;transition:all .12s}
+.sw:hover{transform:scale(1.1)}
+.sw.on{border-color:#1a1a1a;transform:scale(1.05)}
+.sw-lbl{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:7.5px;white-space:nowrap;color:#888;pointer-events:none}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+button{font-size:12px;padding:7px 13px;border-radius:8px;border:1px solid #e0e0e0;background:#f5f5f5;color:#1a1a1a;cursor:pointer;font-family:inherit;transition:all .1s}
+button:hover{background:#eee}
+.pri{background:#1a1a1a!important;color:#fff!important;border-color:#1a1a1a!important}
+.pri:hover{opacity:.85!important}
+.rng-wrap{margin-top:4px}
+.rng-row{display:flex;align-items:center;gap:8px}
+.rng-row input[type=range]{flex:1;accent-color:#1a1a1a}
+.rng-val{font-size:11px;color:#888;min-width:36px}
+.rng-hint{font-size:10px;color:#bbb;margin-top:2px}
+.preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pbtn{font-size:11px;padding:4px 11px;border-radius:16px;border:1px solid #e0e0e0;background:#f5f5f5;color:#1a1a1a;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
+.pbtn:hover{background:#eee}
+.pdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.frame{width:360px;height:480px;overflow:hidden;flex-shrink:0;box-shadow:0 4px 24px rgba(0,0,0,.12)}
+.tip{font-size:10px;color:#aaa;text-align:center;margin-top:8px}
+.export-btn{width:360px;margin-top:12px;padding:10px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.export-btn:hover{opacity:.85}
+h1{font-size:22px;font-weight:700;margin-bottom:14px;letter-spacing:-.02em}
+h1 span{opacity:.35;font-weight:400}
+.section-title{font-size:10px;font-weight:700;letter-spacing:.1em;color:#aaa;text-transform:uppercase;margin-bottom:6px;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.section-title:first-child{margin-top:0;padding-top:0;border-top:none}
+.chevron{cursor:pointer;font-size:18px;color:#bbb;border:none;background:none;padding:2px 4px;line-height:1;transition:transform .2s;font-family:inherit}
+.chevron.open{transform:rotate(180deg)}
+.tune-body{display:none}
+.tune-body.open{display:block}
+.layout-cat{font-size:9px;font-weight:700;letter-spacing:.12em;color:#bbb;text-transform:uppercase;margin-bottom:4px;margin-top:10px}
+.layout-cat:first-child{margin-top:0}
+.md-box{width:360px;margin-top:12px}
+.md-ta{width:100%;height:178px;resize:vertical;padding:10px 12px;font-size:12px;border:1px solid #e0e0e0;border-radius:8px;background:#fafafa;color:#1a1a1a;font-family:'Helvetica Neue',monospace;line-height:1.6}
+.md-ta:focus{outline:none;border-color:#aaa}
+.copy-btn{width:360px;margin-top:8px;padding:10px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.copy-btn:hover{opacity:.85}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Left control panel -->
+<div class="panel">
+  <h1>CardCake <span>小蛋糕笔记🍰</span></h1>
+
+  <div class="section-title">Content</div>
+
+  <div class="sec"><label>HEADING</label>
+  <textarea id="kp" rows="2">我希望写作，
+像偷吃最爱的切片蛋糕🍰</textarea></div>
+
+  <div class="sec"><label>BODY</label>
+  <textarea id="body" rows="4">柠檬磅蛋糕 · 抹茶三重奏
+蔓越莓乳酪 · 蓝莓奶盖芝士
+芋泥巴斯克 · 朱古力豆豆挞
+薄荷生巧慕斯 · 奶油戚风卷
+
+
+**奶油在嘴里化开，灵感大王驾到**
+就这样
+小口小口吃，一张一张写……</textarea></div>
+
+  <div class="sec"><label>SOURCE</label>
+  <textarea id="lbl" rows="1">@豆比猎人 · 小红书</textarea></div>
+
+  <div class="section-title">FONT</div>
+
+  <div class="g2 sec">
+    <div><label>HEADING</label>
+    <div class="chips" id="kpf">
+      <button class="chip on" onclick="setF('kpf',0,this)">Mono ✦</button>
+      <button class="chip" onclick="setF('kpf',1,this)">Black</button>
+      <button class="chip" onclick="setF('kpf',2,this)">Light</button>
+    </div></div>
+    <div><label>BODY</label>
+    <div class="chips" id="bodyf">
+      <button class="chip" onclick="setF('bodyf',0,this)">Black</button>
+      <button class="chip" onclick="setF('bodyf',1,this)">Light</button>
+      <button class="chip on" onclick="setF('bodyf',2,this)">Regular ✦</button>
+    </div></div>
+  </div>
+
+  <div class="section-title">COLOR</div>
+
+  <div class="sec"><div class="swg" id="swatches"></div></div>
+
+  <div class="section-title">LAYOUT</div>
+
+  <div class="sec" id="layout-sec">
+    <div style="display:flex;gap:18px;align-items:flex-start">
+      <div>
+        <div class="layout-cat">AIR</div>
+        <div class="chips">
+          <button class="chip" onclick="setL(0,this)">Breathe</button>
+          <button class="chip" onclick="setL(1,this)">Dialog</button>
+        </div>
+      </div>
+      <div>
+        <div class="layout-cat">DECO</div>
+        <div class="chips">
+          <button class="chip" onclick="setL(2,this)">Envelope</button>
+          <button class="chip on" onclick="setL(3,this)">Sandwich</button>
+        </div>
+      </div>
+      <div>
+        <div class="layout-cat">BINDER</div>
+        <div class="chips">
+          <button class="chip" onclick="setL(4,this)">Left</button>
+          <button class="chip" onclick="setL(5,this)">Right</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="justify-content:flex-start;gap:6px">
+    TUNE
+    <button class="chevron" id="tune-chevron" onclick="toggleTune()">▾</button>
+  </div>
+
+  <div class="tune-body" id="tune-body">
+    <div class="g2 sec">
+      <div><label>SIZE · Heading</label>
+      <div class="rng-wrap">
+        <div class="rng-row"><input type="range" id="kp-sz" min="14" max="40" value="22" step="1" oninput="document.getElementById('kp-szv').textContent=this.value+'px';generate()"><span class="rng-val" id="kp-szv">22px</span></div>
+        <div class="rng-hint">Default 22px</div>
+      </div></div>
+      <div><label>SIZE · Body</label>
+      <div class="rng-wrap">
+        <div class="rng-row"><input type="range" id="bd-sz" min="10" max="20" value="13" step="1" oninput="document.getElementById('bd-szv').textContent=this.value+'px';generate()"><span class="rng-val" id="bd-szv">13px</span></div>
+        <div class="rng-hint">Default 13px</div>
+      </div></div>
+    </div>
+    <div class="g2 sec">
+      <div><label>GAP · H↔B</label>
+      <div class="rng-wrap">
+        <div class="rng-row"><input type="range" id="kp-gap" min="8" max="48" value="28" step="2" oninput="document.getElementById('kp-gapv').textContent=this.value+'px';generate()"><span class="rng-val" id="kp-gapv">28px</span></div>
+        <div class="rng-hint">Default 28px</div>
+      </div></div>
+      <div><label>LINE · Body</label>
+      <div class="rng-wrap">
+        <div class="rng-row"><input type="range" id="line-h" min="1.2" max="2.4" value="1.8" step="0.1" oninput="document.getElementById('line-hv').textContent=parseFloat(this.value).toFixed(1);generate()"><span class="rng-val" id="line-hv">1.8</span></div>
+        <div class="rng-hint">Default 1.8</div>
+      </div></div>
+    </div>
+    <div class="g2 sec">
+      <div><label>BORDER HEIGHT</label>
+      <div class="rng-wrap">
+        <div class="rng-row"><input type="range" id="bot-h" min="40" max="180" value="68" step="4" oninput="document.getElementById('bot-hv').textContent=this.value+'px';generate()"><span class="rng-val" id="bot-hv">68px</span></div>
+        <div class="rng-hint">DECO layout · Default 68px</div>
+      </div></div>
+      <div><label>BORDER WIDTH</label>
+      <div class="rng-wrap">
+        <div class="rng-row"><input type="range" id="bdr-w" min="12" max="72" value="28" step="4" oninput="document.getElementById('bdr-wv').textContent=this.value+'px';generate()"><span class="rng-val" id="bdr-wv">28px</span></div>
+        <div class="rng-hint">BINDER layout · Default 28px</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section-title">PRESETS</div>
+
+  <div class="sec">
+  <div class="preset-row" id="preset-row"><span style="font-size:11px;color:#aaa">No presets saved</span></div></div>
+
+  <div class="btn-row">
+    <button class="pri" onclick="generate()">GENERATE</button>
+    <button onclick="savePreset()" style="border-color:#1B4332;color:#1B4332">⊕ SAVE STYLE</button>
+    <button onclick="shuffle()">⟳ Shuffle</button>
+  </div>
+</div>
+
+<!-- Right preview -->
+<div class="preview-col">
+  <div class="frame" id="card"></div>
+  <button class="export-btn" onclick="exportPNG()">⬇ EXPORT PNG</button>
+  <p class="tip">CardCake · 3:4 · 360×480px</p>
+  <div class="md-box">
+    <textarea class="md-ta" id="md-out" placeholder="Card content in Markdown will appear here after generating..."></textarea>
+    <button class="copy-btn" onclick="copyMd()">COPY TO CLIPBOARD</button>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const KP_FONTS=[
+  {ff:"'Space Mono','Courier New',monospace",fw:'700'},
+  {ff:"'Inter','Arial Black',sans-serif",fw:'900'},
+  {ff:"'Inter','Helvetica Neue',sans-serif",fw:'300'},
+];
+const BD_FONTS=[
+  {ff:"'Inter','Arial Black',sans-serif",fw:'900'},
+  {ff:"'Inter','Helvetica Neue',sans-serif",fw:'300'},
+  {ff:"'Noto Sans SC','Helvetica Neue',sans-serif",fw:'400'},
+];
+
+// bg2 = accent color (used as source block bg in DECO, main bg in BINDER)
+// t2 = text on accent bg: white for most; Lemon & Forest use text color
+// side = sidebar color for Sandwich layout
+const TARTS=[
+  {n:'Vanilla',    bg:'#FFFBF0',bg2:'#F5E6C8',t1:'#3B2A0A',t2:'#3B2A0A',s:['#F5E6C8','#F0A055','#F0A055','#F5E6C8'],bdr:'#F5E6C8',side:'#F0A055'},
+  {n:'Lemon',      bg:'#FDFBE8',bg2:'#FBE580',t1:'#3D3510',t2:'#3D3510',s:['#E8D84A','#88B337','#88B337','#E8D84A'],bdr:'#E8D84A',side:'#88B337'},
+  {n:'Matcha',     bg:'#EBF2E8',bg2:'#426d28',t1:'#2A3D2A',t2:'#ffffff',s:['#426d28','#f7cad3','#f7cad3','#426d28'],bdr:'#426d28',side:'#f7cad3'},
+  {n:'Raspberry',  bg:'#FFF0F2',bg2:'#C9547A',t1:'#4A1A22',t2:'#ffffff',s:['#C9547A','#F7DB91','#F7DB91','#C9547A'],bdr:'#C9547A',side:'#F7DB91'},
+  {n:'Blueberry',  bg:'#EEF0FA',bg2:'#1C6EA4',t1:'#1E2345',t2:'#ffffff',s:['#1C6EA4','#FFF9AF','#FFF9AF','#1C6EA4'],bdr:'#1C6EA4',side:'#FFF9AF'},
+  {n:'Taro',       bg:'#F3EEF8',bg2:'#9183bc',t1:'#2E1A3E',t2:'#ffffff',s:['#9183bc','#accdd4','#accdd4','#9183bc'],bdr:'#9183bc',side:'#accdd4'},
+  {n:'Chocolate',  bg:'#F5EDE6',bg2:'#0d0d0d',t1:'#2C1A0E',t2:'#ffffff',s:['#0d0d0d','#cb4c73','#cb4c73','#0d0d0d'],bdr:'#0d0d0d',side:'#cb4c73'},
+  {n:'Mint',       bg:'#E8F6F4',bg2:'#5ABFB0',t1:'#0F3530',t2:'#ffffff',s:['#5ABFB0','#077A7D','#077A7D','#5ABFB0'],bdr:'#5ABFB0',side:'#077A7D'},
+];
+
+// Layout index: 0=Breathe, 1=Dialog, 2=Envelope, 3=Sandwich, 4=Left, 5=Right
+const DEF_BOT=[80,140,68,68,80,80];
+const DEF_BDR=28;
+
+let cT=1,cL=3,cKF=0,cBF=2;
+let savedPresets=[];
+
+function buildSw(){
+  const el=document.getElementById('swatches');el.innerHTML='';
+  TARTS.forEach((t,i)=>{
+    const d=document.createElement('div');
+    d.className='sw'+(i===cT?' on':'');
+    d.title=t.n;
+    d.style.background=`linear-gradient(135deg,${t.bg} 50%,${t.bg2} 50%)`;
+    d.innerHTML=`<span class="sw-lbl">${t.n}</span>`;
+    d.onclick=()=>{cT=i;buildSw();generate()};
+    el.appendChild(d);
+  });
+}
+
+function setF(g,i,el){
+  if(g==='kpf')cKF=i;else cBF=i;
+  document.querySelectorAll('#'+g+' .chip').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');generate();
+}
+
+function setL(i,el){
+  cL=i;
+  document.querySelectorAll('#layout-sec .chip').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  const dh=DEF_BOT[i];
+  document.getElementById('bot-h').value=dh;
+  document.getElementById('bot-hv').textContent=dh+'px';
+  generate();
+}
+
+function toggleTune(){
+  document.getElementById('tune-body').classList.toggle('open');
+  document.getElementById('tune-chevron').classList.toggle('open');
+}
+
+function parseMarkdown(txt){
+  return txt
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>');
+}
+
+function logoLine(color){
+  return`<div style="margin-top:5px;font-size:8px;letter-spacing:.12em;font-family:'Helvetica Neue',sans-serif;color:${color};opacity:.4;font-weight:400">Designed by CardCake</div>`;
+}
+
+function srcBlock(color){
+  const lbl=document.getElementById('lbl').value||'';
+  const lblHTML=lbl?`<div style="font-size:10px;letter-spacing:.07em;line-height:1.6;font-family:'Helvetica Neue',sans-serif;color:${color}">${lbl.replace(/\n/g,'<br>')}</div>`:'';
+  return`<div style="flex-shrink:0">${lblHTML}${logoLine(color)}</div>`;
+}
+
+function botCenterWrap(textC){
+  const lbl=document.getElementById('lbl').value||'';
+  const lblHTML=lbl?`<div style="font-size:10px;letter-spacing:.07em;line-height:1.6;text-align:center;font-family:'Helvetica Neue',sans-serif;color:${textC}">${lbl.replace(/\n/g,'<br>')}</div>`:'';
+  return`<div style="text-align:center">${lblHTML}${logoLine(textC)}</div>`;
+}
+
+function renderKP(raw,sz,ff,fw){
+  const lines=raw.split(/\n+/).filter(p=>p.trim());
+  const html=lines.map(l=>`<div style="margin-bottom:4px">${parseMarkdown(l)}</div>`).join('');
+  return`<div style="font-size:${sz};font-weight:${fw};line-height:1.28;font-family:${ff}">${html}</div>`;
+}
+
+function renderBodyHTML(raw,sz,ff,fw,lh){
+  const lines=raw.trim().split(/\n/);
+  let html='';
+  lines.forEach(line=>{
+    const t=line.trim();
+    if(t===''){
+      html+=`<div style="height:0.7em"></div>`;
+    } else if(t.startsWith('- ')){
+      html+=`<div style="margin-bottom:4px">${parseMarkdown(t.slice(2))}</div>`;
+    } else {
+      html+=`<p style="margin-bottom:8px">${parseMarkdown(t)}</p>`;
+    }
+  });
+  return`<div style="font-size:${sz};font-weight:${fw};line-height:${lh};font-family:${ff};opacity:.9">${html}</div>`;
+}
+
+function mkCard(kpRaw,bodyRaw){
+  const t=TARTS[cT];
+  const botH=parseInt(document.getElementById('bot-h').value)||80;
+  const bdrW=parseInt(document.getElementById('bdr-w').value)||28;
+  const kpSz=document.getElementById('kp-sz').value+'px';
+  const bdSz=document.getElementById('bd-sz').value+'px';
+  const kpGap=document.getElementById('kp-gap').value+'px';
+  const lineH=document.getElementById('line-h').value;
+  const kpFF=KP_FONTS[cKF].ff,kpFW=KP_FONTS[cKF].fw;
+  const bFF=BD_FONTS[cBF].ff,bFW=BD_FONTS[cBF].fw;
+  const hasBody=bodyRaw.trim().length>0;
+  const bigKpSz=Math.min(parseInt(kpSz)+10,40)+'px';
+  const KP=renderKP(kpRaw,hasBody?kpSz:bigKpSz,kpFF,kpFW);
+  const BODY=hasBody?renderBodyHTML(bodyRaw,bdSz,bFF,bFW,lineH):'';
+  const s=t.s;
+
+  // 0 = Breathe (AIR)
+  if(cL===0) return`<div style="width:100%;height:100%;background:${t.bg};color:${t.t1};display:flex;flex-direction:column;padding:44px 36px 32px"><div style="flex:1;min-height:0">${KP}${hasBody?`<div style="margin-top:${kpGap}">${BODY}</div>`:''}</div>${srcBlock(t.t1)}</div>`;
+
+  // 1 = Dialog (AIR)
+  if(cL===1) return`<div style="width:100%;height:100%;display:flex;flex-direction:column"><div style="height:${botH}px;flex-shrink:0;background:${t.bg};color:${t.t1};padding:32px 28px 20px;display:flex;flex-direction:column;justify-content:flex-end">${KP}</div><div style="flex:1;min-height:0;background:${t.bg2};color:${t.t2};padding:18px 28px 20px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden"><div style="flex:1;min-height:0;overflow:hidden">${BODY}</div>${srcBlock(t.t2)}</div></div>`;
+
+  // 2 = Envelope (DECO) — two thin stripes + source block
+  if(cL===2) return`<div style="width:100%;height:100%;background:${t.bg};color:${t.t1};display:flex;flex-direction:column"><div style="flex:1;min-height:0;padding:36px 30px 16px;overflow:hidden">${KP}${hasBody?`<div style="margin-top:${kpGap}">${BODY}</div>`:''}</div><div style="height:9px;flex-shrink:0;background:${s[0]}"></div><div style="height:9px;flex-shrink:0;background:${s[2]}"></div><div style="height:${botH-18}px;flex-shrink:0;background:${t.bg2};color:${t.t2};display:flex;align-items:center;justify-content:center;padding:8px 22px">${botCenterWrap(t.t2)}</div></div>`;
+
+  // 3 = Sandwich (DECO) — center=accent(bg2), sides=side color
+  if(cL===3){const sc=t.side;return`<div style="width:100%;height:100%;background:${t.bg};color:${t.t1};display:flex;flex-direction:column"><div style="flex:1;min-height:0;padding:36px 30px 16px;overflow:hidden">${KP}${hasBody?`<div style="margin-top:${kpGap}">${BODY}</div>`:''}</div><div style="height:${botH}px;flex-shrink:0;display:flex;width:100%"><div style="width:44px;min-width:44px;background:${sc}"></div><div style="flex:1;background:${t.bg2};display:flex;align-items:center;justify-content:center;padding:6px 14px;color:${t.t2}">${botCenterWrap(t.t2)}</div><div style="width:44px;min-width:44px;background:${sc}"></div></div></div>`;}
+
+  // 4 = Left (BINDER)
+  if(cL===4) return`<div style="width:100%;height:100%;background:${t.bg2};display:flex"><div style="width:${bdrW}px;min-width:${bdrW}px;background:${t.bg}"></div><div style="flex:1;min-width:0;padding:${hasBody?'32px 24px 28px':'44px 24px'};color:${t.t2};display:flex;flex-direction:column;justify-content:space-between"><div style="flex:1;min-height:0;overflow:hidden">${KP}${hasBody?`<div style="margin-top:${kpGap}">${BODY}</div>`:''}</div>${srcBlock(t.t2)}</div></div>`;
+
+  // 5 = Right (BINDER)
+  if(cL===5) return`<div style="width:100%;height:100%;background:${t.bg2};display:flex"><div style="flex:1;min-width:0;padding:${hasBody?'32px 24px 28px':'44px 24px'};color:${t.t2};display:flex;flex-direction:column;justify-content:space-between"><div style="flex:1;min-height:0;overflow:hidden">${KP}${hasBody?`<div style="margin-top:${kpGap}">${BODY}</div>`:''}</div>${srcBlock(t.t2)}</div><div style="width:${bdrW}px;min-width:${bdrW}px;background:${t.bg}"></div></div>`;
+
+  return'';
+}
+
+function escRx(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+
+function updateMarkdownBox(heading,body){
+  const ta=document.getElementById('md-out');
+  const newBlock=`## ${heading}\n\n${body}`;
+  const current=ta.value;
+  const rx=new RegExp(`## ${escRx(heading)}(?:\\n\\n[\\s\\S]*?)?(?=\\n\\n## |$)`);
+  if(current && rx.test(current)){
+    ta.value=current.replace(rx,newBlock);
+  } else {
+    ta.value=current?current+'\n\n'+newBlock:newBlock;
+  }
+}
+
+function generate(){
+  const kp=document.getElementById('kp').value||'Key Point';
+  const body=document.getElementById('body').value||'';
+  document.getElementById('card').innerHTML=mkCard(kp,body);
+  updateMarkdownBox(kp.split('\n').map(l=>l.trim()).filter(Boolean).join(' '),body);
+}
+
+function copyMd(){
+  const ta=document.getElementById('md-out');
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    const btn=document.querySelector('.copy-btn');
+    const prev=btn.textContent;
+    btn.textContent='COPIED!';
+    setTimeout(()=>{btn.textContent=prev;},1500);
+  }).catch(()=>{ta.select();document.execCommand('copy');});
+}
+
+async function exportPNG(){
+  const el=document.getElementById('card');
+  const btn=document.querySelector('.export-btn');
+  btn.textContent='Exporting...';btn.disabled=true;
+  try{
+    const canvas=await html2canvas(el,{scale:3,useCORS:true,allowTaint:true,backgroundColor:null});
+    const link=document.createElement('a');
+    link.download=`cardcake-${Date.now()}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }catch(e){alert('Export failed, please try again.');}
+  btn.textContent='⬇ EXPORT PNG';btn.disabled=false;
+}
+
+function savePreset(){
+  const t=TARTS[cT];
+  const layoutNames=['Breathe','Dialog','Envelope','Sandwich','Left','Right'];
+  const p={name:`${t.n} · ${layoutNames[cL]}`,t:cT,l:cL,kf:cKF,bf:cBF,
+    botH:document.getElementById('bot-h').value,
+    bdrW:document.getElementById('bdr-w').value,
+    kpSz:document.getElementById('kp-sz').value,
+    bdSz:document.getElementById('bd-sz').value,
+    kpGap:document.getElementById('kp-gap').value,
+    lineH:document.getElementById('line-h').value,
+    color:t.bg2};
+  savedPresets.push(p);renderPresets();
+  try{localStorage.setItem('cardcake-presets',JSON.stringify(savedPresets));}catch(e){}
+}
+
+function loadPreset(i){
+  const p=savedPresets[i];
+  cT=p.t;cL=p.l;cKF=p.kf;cBF=p.bf;
+  document.getElementById('bot-h').value=p.botH;document.getElementById('bot-hv').textContent=p.botH+'px';
+  document.getElementById('bdr-w').value=p.bdrW||DEF_BDR;document.getElementById('bdr-wv').textContent=(p.bdrW||DEF_BDR)+'px';
+  document.getElementById('kp-sz').value=p.kpSz;document.getElementById('kp-szv').textContent=p.kpSz+'px';
+  document.getElementById('bd-sz').value=p.bdSz;document.getElementById('bd-szv').textContent=p.bdSz+'px';
+  const g=p.kpGap||'28';document.getElementById('kp-gap').value=g;document.getElementById('kp-gapv').textContent=g+'px';
+  const lh=p.lineH||'1.8';document.getElementById('line-h').value=lh;document.getElementById('line-hv').textContent=parseFloat(lh).toFixed(1);
+  buildSw();
+  document.querySelectorAll('#layout-sec .chip').forEach((b,j)=>b.classList.toggle('on',j===cL));
+  document.querySelectorAll('#kpf .chip').forEach((b,j)=>b.classList.toggle('on',j===cKF));
+  document.querySelectorAll('#bodyf .chip').forEach((b,j)=>b.classList.toggle('on',j===cBF));
+  generate();
+}
+
+function deletePreset(i){
+  savedPresets.splice(i,1);renderPresets();
+  try{localStorage.setItem('cardcake-presets',JSON.stringify(savedPresets));}catch(e){}
+}
+
+function renderPresets(){
+  const row=document.getElementById('preset-row');
+  if(!savedPresets.length){row.innerHTML='<span style="font-size:11px;color:#aaa">No presets saved</span>';return;}
+  row.innerHTML='';
+  savedPresets.forEach((p,i)=>{
+    const b=document.createElement('div');b.className='pbtn';
+    b.innerHTML=`<span class="pdot" style="background:${p.color}"></span>${p.name}<span onclick="event.stopPropagation();deletePreset(${i})" style="font-size:10px;opacity:.5;cursor:pointer;margin-left:3px">×</span>`;
+    b.onclick=()=>loadPreset(i);row.appendChild(b);
+  });
+}
+
+function shuffle(){
+  cT=Math.floor(Math.random()*TARTS.length);
+  cL=Math.floor(Math.random()*6);
+  cKF=Math.floor(Math.random()*KP_FONTS.length);
+  cBF=Math.floor(Math.random()*BD_FONTS.length);
+  const dh=DEF_BOT[cL];
+  document.getElementById('bot-h').value=dh;document.getElementById('bot-hv').textContent=dh+'px';
+  document.getElementById('bdr-w').value=DEF_BDR;document.getElementById('bdr-wv').textContent=DEF_BDR+'px';
+  document.getElementById('kp-sz').value=22;document.getElementById('kp-szv').textContent='22px';
+  document.getElementById('bd-sz').value=13;document.getElementById('bd-szv').textContent='13px';
+  document.getElementById('kp-gap').value=28;document.getElementById('kp-gapv').textContent='28px';
+  document.getElementById('line-h').value=1.8;document.getElementById('line-hv').textContent='1.8';
+  buildSw();
+  document.querySelectorAll('#layout-sec .chip').forEach((b,j)=>b.classList.toggle('on',j===cL));
+  document.querySelectorAll('#kpf .chip').forEach((b,j)=>b.classList.toggle('on',j===cKF));
+  document.querySelectorAll('#bodyf .chip').forEach((b,j)=>b.classList.toggle('on',j===cBF));
+  generate();
+}
+
+// Load saved presets
+try{const saved=localStorage.getItem('cardcake-presets');if(saved){savedPresets=JSON.parse(saved);renderPresets();}}catch(e){}
+buildSw();generate();
+</script>
+</body>
+</html>
