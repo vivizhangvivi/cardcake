@@ -1,7 +1,8 @@
 # CardCake 小蛋糕笔记 🍰
 
 A tiny card-making tool for writing beautiful notes and sharing them
-on social platform. Pick a flavor, type your thought, export your card.
+on social platform. 
+Pick a flavor, type your thought, export your card.
 
 ## ✨ Try it live
 👉 [https://doubihunter.github.io/CardCake]
