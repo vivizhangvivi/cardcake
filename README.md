@@ -5,7 +5,7 @@ on social platform.
 Pick a flavor, type your thought, export your card.
 
 ## ✨ Try it live
-👉 [https://doubihunter.github.io/CardCake](https://vivizhangvivi.github.io/cardcake]
+👉 [https://vivizhangvivi.github.io/cardcake]
 
 ## What it does
 - 8 color themes (Vanilla, Matcha, Raspberry...)
